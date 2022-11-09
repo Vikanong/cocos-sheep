@@ -20,6 +20,16 @@ export class card extends Component {
     public card4: SpriteFrame = null
     @property({ type: SpriteFrame })
     public card5: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card6: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card7: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card8: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card9: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card10: SpriteFrame = null
 
     public setIcon(type: number) {
         let icon = this.node.getChildByName('icon');

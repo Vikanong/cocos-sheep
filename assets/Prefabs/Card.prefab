@@ -425,6 +425,26 @@
       "__uuid__": "8c097827-1447-4e26-b407-5a47650fb82e@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
+    "card6": {
+      "__uuid__": "178caf60-e58d-4e73-a2e3-15a369447f6a@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "card7": {
+      "__uuid__": "b134aa8f-e0d1-4af1-8fc1-5cb7a9d469cf@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "card8": {
+      "__uuid__": "5a79d553-1697-4fda-8ab3-f0fc3c005f5c@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "card9": {
+      "__uuid__": "ad0e69f5-6ff6-4ebf-b618-378a448698eb@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "card10": {
+      "__uuid__": "cf08d0e9-4b9c-44c8-bd90-e73c18e3c246@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
     "_id": ""
   },
   {

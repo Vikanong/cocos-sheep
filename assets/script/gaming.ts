@@ -33,7 +33,7 @@ export class gaming extends Component {
     private _pointPostion: object = {}
 
     // 总卡牌数
-    private _cardTotal = 60
+    private _cardTotal = 300
     // 所有卡片
     private _allCard: cardInfo[] = []
 
@@ -44,7 +44,7 @@ export class gaming extends Component {
     private _typeNumArr: number[] = []
 
     // 卡牌总类型
-    private _cardTypeTotal: number = 5
+    private _cardTypeTotal: number = 10
 
     // 最大层级
     private _zIndex = 8
