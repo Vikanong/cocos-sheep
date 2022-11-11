@@ -23,6 +23,14 @@ export class gaming extends Component {
     @property({ type: Prefab })
     public cardPrefab: Prefab = null
 
+    // 游戏结束界面
+    @property(Node)
+    public gameOverPage: Node = null
+
+    // 游戏完成界面
+    @property(Node)
+    public gameOverSuccessPage: Node = null
+
     // 卡牌宽高
     private _cardWidth: number = 80
     private _cardHeight: number = 80
@@ -32,8 +40,12 @@ export class gaming extends Component {
     // 总坐标
     private _pointPostion: object = {}
 
-    // 总卡牌数
-    private _cardTotal = 300
+    // 总生成卡牌数
+    private _cardTotal = 150
+
+    // 当前剩余的卡片数量
+    private _remainingCardNum = 150
+
     // 所有卡片
     private _allCard: cardInfo[] = []
 
@@ -51,9 +63,6 @@ export class gaming extends Component {
 
     // 游戏状态
     private gameStatus = 0   //0：游戏准备，1：游戏进行中，2：游戏结束
-
-    // 已点击的卡片
-    private outCardArr: number[] = []
 
     // 暂存的卡片
     private columnArr: object[] = []
@@ -189,8 +198,8 @@ export class gaming extends Component {
                 node.off(Input.EventType.TOUCH_START, this.cardClick, this);
 
                 let arr = this._cardsObj[Card._point];
-                arr.splice(arr.indexOf(Card._index), 1);
-                this._cardsObj[Card._point] = arr;
+                this._cardsObj[Card._point].splice(arr.indexOf(Card._index), 1);
+
                 this.columnArr.push({
                     index: Card._index,
                     point: Card._point,
@@ -232,6 +241,7 @@ export class gaming extends Component {
 
     // 撤回一步
     private withdraw() {
+        if (this.gameStatus != 1) return;
         if (this.columnArr.length <= 0) return;
         const obj = this.columnArr.slice(-1)[0];
         this.columnArr.pop();
@@ -251,11 +261,11 @@ export class gaming extends Component {
 
     }
 
-    // 判断传入牌是否是周围牌的顶层
+    // 判断传入卡片是否是周围卡片的顶层
     private isCardTop(point, index, exclude) {
         const pointArr = this.getRound(point);
         const is = pointArr.every(p => {
-            if (p > 0 && p < this._point) {
+            if (p > 0 && p <= this._point) {
                 const i_arr = this._cardsObj[p];
                 if (i_arr) {
                     const n_i_arr = i_arr.filter(i => i != exclude && i != index);
@@ -274,17 +284,34 @@ export class gaming extends Component {
     private getRound(pos) {
         const i = 13;
         let arr = [pos];
-        if (pos > i) {
+        if (pos > 13) {
             arr.push(pos - i);
         }
         if (pos < 170) {
             arr.push(pos + i);
-        }
-        if (pos != 1 && pos % i != 1) {
-            arr = arr.concat([pos - i - 1, pos - 1, pos + i - 1]);
+
         }
         if (pos % i != 0) {
-            arr = arr.concat([pos - i + 1, pos + 1, pos + i + 1]);
+            arr.push(pos + 1);
+
+            if (pos < 170) {
+                arr.push(pos + i + 1)
+            }
+
+            if (pos > 13) {
+                arr.push(pos - i + 1);
+            }
+        }
+        if (pos % i != 1) {
+            arr.push(pos - 1);
+
+            if (pos < 170) {
+                arr.push(pos + i - 1)
+            }
+
+            if (pos > 13) {
+                arr.push(pos - i - 1);
+            }
         }
         return arr;
     }
@@ -299,41 +326,46 @@ export class gaming extends Component {
             });
             if (arr.length == 3) {
                 arr.forEach(i => {
+                    const ind = this.columnArr.indexOf(i);
+                    this.columnArr.splice(ind, 1);
+
                     const node = this.container.children[i.index];
                     tween(node).to(0.15, { scale: new Vec3(0.2, 0.2, 0.2) }).call(() => {
                         node.active = false;
                     }).start();
-
-                    const ind = this.columnArr.indexOf(i);
-                    this.columnArr.splice(ind, 1);
                 })
-                this.scheduleOnce(() => {
-                    this.resetColumnPos();
-                }, 0.2);
+                this._remainingCardNum -= 3;
                 return false;
             }
             return true;
         });
+
         if (is || this.columnArr.length == 0) {
             this.isClick = true;
+        } else {
+            this.scheduleOnce(() => {
+                this.resetColumnPos();
+            }, 0.16);
         }
+
         // 游戏结束
         if (this.columnArr.length >= 7) {
             this.gameStatus = 2;
             this.isClick = false;
+            this.gameOver();
+        }
 
-            this.scheduleOnce(() => {
-                alert("游戏结束");
-                this.resetGame();
-            }, 0.1);
+        if (this._remainingCardNum <= 0) {
+            this.gameOverSuccess();
         }
     }
 
     // 重置位置
     private resetColumnPos() {
-        this.columnArr.forEach((item, index) => {
+        // this.isClick = false;
+        this.columnArr.forEach((item, i) => {
             let node = this.container.children[item.index];
-            const x = (index + 1) * 80 - 40;
+            const x = (i + 1) * 80 - 40;
             tween(node).to(0.3, { position: new Vec3(x, -835, 0) }).call(() => {
                 this.isClick = true;
             }).start();
@@ -349,9 +381,21 @@ export class gaming extends Component {
         this.isClick = true;
         this.container.removeAllChildren();
         this.container.destroyAllChildren();
+        this.gameOverPage.active = false;
+        this.gameOverSuccessPage.active = false;
 
         this.randomType();
         this.createCard();
+    }
+
+    // 游戏失败
+    private gameOver() {
+        this.gameOverPage.active = true
+    }
+
+    // 游戏完成 并结束
+    private gameOverSuccess() {
+        this.gameOverSuccessPage.active = true
     }
 
     private _init() {
