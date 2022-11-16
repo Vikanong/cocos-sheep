@@ -30,8 +30,19 @@ export class card extends Component {
     public card9: SpriteFrame = null
     @property({ type: SpriteFrame })
     public card10: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card11: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card12: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card13: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card14: SpriteFrame = null
+    @property({ type: SpriteFrame })
+    public card15: SpriteFrame = null
 
     public setIcon(type: number) {
+        this._type = type;
         let icon = this.node.getChildByName('icon');
         icon.getComponent(Sprite).spriteFrame = this[`card${type}`];
         icon.setScale(0.5, 0.5);
@@ -40,10 +51,8 @@ export class card extends Component {
     public setCard(point: number, index: number, type: number) {
         this._point = point;
         this._index = index;
-        this._type = type;
         this.setIcon(type);
     }
-
 
     public setIndex(t) {
         let indexLabel = this.node.getChildByName('indexLabel');

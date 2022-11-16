@@ -1,12 +1,14 @@
-import { _decorator, Component, Node, Prefab, Vec3, math, tween, instantiate, Input, Color, Sprite } from 'cc';
+import { _decorator, Component, Node, Label, Prefab, Vec3, math, tween, instantiate, Input, Color, Sprite } from 'cc';
 import { card } from './card';
 import { GameManager } from './gameManager'
 
 const { ccclass, property } = _decorator;
 
 interface cardInfo {
-    zIndex: number;
+    index: number;
     pos: number;
+    isClick: boolean;
+    type: number;
 }
 
 @ccclass('gaming')
@@ -41,10 +43,10 @@ export class gaming extends Component {
     private _pointPostion: object = {}
 
     // 总生成卡牌数
-    private _cardTotal = 150
+    private _cardTotal = 225
 
     // 当前剩余的卡片数量
-    private _remainingCardNum = 150
+    private _remainingCardNum = 225
 
     // 所有卡片
     private _allCard: cardInfo[] = []
@@ -56,10 +58,7 @@ export class gaming extends Component {
     private _typeNumArr: number[] = []
 
     // 卡牌总类型
-    private _cardTypeTotal: number = 10
-
-    // 最大层级
-    private _zIndex = 8
+    private _cardTypeTotal: number = 15
 
     // 游戏状态
     private gameStatus = 0   //0：游戏准备，1：游戏进行中，2：游戏结束
@@ -69,6 +68,16 @@ export class gaming extends Component {
 
     // 是否可以点击
     private isClick: boolean = true
+
+    // 可撤销次数
+    private withdrawTotal: number = 5
+    @property(Label)
+    public withdrawTotalLabel: Label = null
+
+    // 可洗牌次数
+    private shuffleTotal: number = 2
+    @property(Label)
+    public shuffleTotalLabel: Label = null
 
 
     // 生成总坐标
@@ -105,6 +114,8 @@ export class gaming extends Component {
             this._allCard.push({
                 index: i,
                 pos: pointPos,
+                isClick: true,
+                type: _type
             });
 
             Card.setPosition(new Vec3(280, -300, 0));
@@ -199,6 +210,7 @@ export class gaming extends Component {
 
                 let arr = this._cardsObj[Card._point];
                 this._cardsObj[Card._point].splice(arr.indexOf(Card._index), 1);
+                this._allCard[Card._index].isClick = false;
 
                 this.columnArr.push({
                     index: Card._index,
@@ -210,14 +222,13 @@ export class gaming extends Component {
                 node.setSiblingIndex(999);
                 const x = this.columnArr.length * 80 - 40;
                 tween(node).to(0.3, { position: new Vec3(x, -835, 0) }).call(() => {
-
                     node.setSiblingIndex(Card._index);
                     this.eliminate();
-
                     // this.isClick = true;
                 }).start();
             }
         }
+
     }
 
     // 判断当前卡片点击后，盖住的卡片那些高亮
@@ -242,7 +253,13 @@ export class gaming extends Component {
     // 撤回一步
     private withdraw() {
         if (this.gameStatus != 1) return;
+        if (this.withdrawTotal <= 0) return;
+        this.withdrawTotal--;
+        this.withdrawTotalLabel.string = this.withdrawTotal.toString();
+
         if (this.columnArr.length <= 0) return;
+        this.isClick = false;
+
         const obj = this.columnArr.slice(-1)[0];
         this.columnArr.pop();
         if (this._cardsObj[obj.point]) {
@@ -257,9 +274,29 @@ export class gaming extends Component {
         tween(node).to(0.3, { position: new Vec3(pos.x, pos.y, 0) }).call(() => {
             node.setSiblingIndex(obj.index);
             node.on(Input.EventType.TOUCH_START, this.cardClick, this);
+            this.checkAround(Card);
         }).start();
-
     }
+
+    // 撤回后原位置后附近卡牌置灰
+    private checkAround(Card) {
+        const roundArr = this.getRound(Card._point);
+        console.log(roundArr);
+        roundArr.forEach(point => {
+            if (point != Card._point) {
+                const i_arr = this._cardsObj[point];
+                if (i_arr !== undefined) {
+                    const ind = i_arr.slice(-1)[0];
+                    let item = this.container.children[ind];
+                    let _itemCard = item.getComponent(card);
+                    _itemCard._clickable = false;
+                }
+            }
+        })
+        this.isClick = true;
+    }
+
+
 
     // 判断传入卡片是否是周围卡片的顶层
     private isCardTop(point, index, exclude) {
@@ -343,9 +380,9 @@ export class gaming extends Component {
         if (is || this.columnArr.length == 0) {
             this.isClick = true;
         } else {
-            this.scheduleOnce(() => {
-                this.resetColumnPos();
-            }, 0.16);
+            // this.scheduleOnce(() => {
+            this.resetColumnPos();
+            // }, 0.16);
         }
 
         // 游戏结束
@@ -354,6 +391,7 @@ export class gaming extends Component {
             this.isClick = false;
             this.gameOver();
         }
+        // console.log(this._remainingCardNum);
 
         if (this._remainingCardNum <= 0) {
             this.gameOverSuccess();
@@ -366,9 +404,39 @@ export class gaming extends Component {
         this.columnArr.forEach((item, i) => {
             let node = this.container.children[item.index];
             const x = (i + 1) * 80 - 40;
-            tween(node).to(0.3, { position: new Vec3(x, -835, 0) }).call(() => {
-                this.isClick = true;
-            }).start();
+            tween(node).to(0.15, { position: new Vec3(x, -835, 0) }).start();
+            this.isClick = true;
+        })
+    }
+
+    // 重新洗牌
+    private shuffle() {
+        if (this.shuffleTotal <= 0) return;
+        this.shuffleTotal--;
+        this.shuffleTotalLabel.string = this.shuffleTotal.toString();
+
+        const arr = this._allCard.filter(i => i.isClick == true);
+        let first_t = null;
+        this._allCard.forEach((item, i) => {
+            if (item.isClick) {
+                const node = this.container.children[item.index];
+                let t = null;
+                if (!first_t) first_t = item.type;
+
+                let nextItem = this._allCard.slice(i + 1).find(item_n => (item_n.isClick));
+                if (nextItem) {
+                    t = nextItem.type;
+                } else {
+                    t = first_t;
+                }
+
+                item.type = t;
+                const pos = this._pointPostion[item.pos];
+                tween(node).to(0.3, { position: new Vec3(280, -350, 0) }).call(() => {
+                    let _card = node.getComponent(card);
+                    _card.setIcon(t);
+                }).delay(0.1).to(0.4, { position: new Vec3(pos.x, pos.y, 0) }).start();
+            }
         })
     }
 
@@ -379,10 +447,16 @@ export class gaming extends Component {
         this.gameStatus = 0;
         this.columnArr = [];
         this.isClick = true;
+        this._remainingCardNum = this._cardTotal;
         this.container.removeAllChildren();
         this.container.destroyAllChildren();
         this.gameOverPage.active = false;
         this.gameOverSuccessPage.active = false;
+        this.withdrawTotal = 3;
+        this.withdrawTotalLabel.string = this.withdrawTotal.toString();
+
+        this.shuffleTotal = 2;
+        this.shuffleTotalLabel.string = this.shuffleTotal.toString();
 
         this.randomType();
         this.createCard();
@@ -402,6 +476,8 @@ export class gaming extends Component {
         this.getCoordinates();
         this.randomType();
         this.createCard();
+        this.withdrawTotalLabel.string = this.withdrawTotal.toString();
+        this.shuffleTotalLabel.string = this.shuffleTotal.toString();
     }
 
 
