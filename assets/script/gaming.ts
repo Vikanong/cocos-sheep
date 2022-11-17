@@ -221,7 +221,7 @@ export class gaming extends Component {
                 this.clickableCheck(Card);
                 node.setSiblingIndex(999);
                 const x = this.columnArr.length * 80 - 40;
-                tween(node).to(0.3, { position: new Vec3(x, -835, 0) }).call(() => {
+                tween(node).to(0.1, { scale: new Vec3(1.13, 1.13, 1.13) }).to(0.3, { position: new Vec3(x, -835, 0) }).to(0.1, { scale: new Vec3(1, 1, 1) }).call(() => {
                     node.setSiblingIndex(Card._index);
                     this.eliminate();
                     // this.isClick = true;
