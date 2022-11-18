@@ -1,6 +1,7 @@
 import { _decorator, Component, Node, Label, Prefab, Vec3, math, tween, instantiate, Input, Color, Sprite } from 'cc';
 import { card } from './card';
-import { GameManager } from './gameManager'
+import { GameManager } from './gameManager';
+import { levelList } from '../level/level';
 
 const { ccclass, property } = _decorator;
 
@@ -43,10 +44,10 @@ export class gaming extends Component {
     private _pointPostion: object = {}
 
     // 总生成卡牌数
-    private _cardTotal = 225
+    private _cardTotal = 135
 
     // 当前剩余的卡片数量
-    private _remainingCardNum = 225
+    private _remainingCardNum = 135
 
     // 所有卡片
     private _allCard: cardInfo[] = []
@@ -70,12 +71,12 @@ export class gaming extends Component {
     private isClick: boolean = true
 
     // 可撤销次数
-    private withdrawTotal: number = 5
+    private withdrawTotal: number = 5    // 修改还需要改重置方法里的值
     @property(Label)
     public withdrawTotalLabel: Label = null
 
     // 可洗牌次数
-    private shuffleTotal: number = 2
+    private shuffleTotal: number = 2   // 修改还需要改重置方法里的值
     @property(Label)
     public shuffleTotalLabel: Label = null
 
@@ -97,15 +98,11 @@ export class gaming extends Component {
 
     // 生成卡片
     private createCard() {
-        for (let i = 0; i < this._cardTotal; i++) {
-
+        levelList.map((pointPos, i) => {
             let Card = instantiate(this.cardPrefab);
             let cardComponent = Card.getComponent(card);
-            // const _type = math.randomRangeInt(1, this._cardTypeTotal + 1);
             const _type = this.getCurrentType();
-            // console.log(_type);
 
-            const pointPos = math.randomRangeInt(1, this._point + 1);
             cardComponent.setCard(pointPos, i, _type);
 
             const pos = this._pointPostion[pointPos];
@@ -144,7 +141,14 @@ export class gaming extends Component {
             } else {
                 this._cardsObj[pointPos] = [i];
             }
-        }
+
+        })
+
+
+        // for (let i = 0; i < levelList; i++) {
+
+
+        // }
 
         this.gameStatus = 1;
     }
