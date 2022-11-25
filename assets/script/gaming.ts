@@ -98,10 +98,12 @@ export class gaming extends Component {
 
     // 生成卡片
     private createCard() {
-        levelList.map((pointPos, i) => {
+        levelList.map((pointPos_, i) => {
             let Card = instantiate(this.cardPrefab);
             let cardComponent = Card.getComponent(card);
             const _type = this.getCurrentType();
+
+            const pointPos = math.randomRangeInt(1, this._point + 1);
 
             cardComponent.setCard(pointPos, i, _type);
 
@@ -143,12 +145,6 @@ export class gaming extends Component {
             }
 
         })
-
-
-        // for (let i = 0; i < levelList; i++) {
-
-
-        // }
 
         this.gameStatus = 1;
     }
@@ -224,11 +220,12 @@ export class gaming extends Component {
 
                 this.clickableCheck(Card);
                 node.setSiblingIndex(999);
+
                 const x = this.columnArr.length * 80 - 40;
-                tween(node).to(0.1, { scale: new Vec3(1.13, 1.13, 1.13) }).to(0.3, { position: new Vec3(x, -835, 0) }).to(0.1, { scale: new Vec3(1, 1, 1) }).call(() => {
+                tween(node).to(0.05, { scale: new Vec3(1.13, 1.13, 1.13) }).to(0.2, { position: new Vec3(x, -835, 0) }).call(() => {
                     node.setSiblingIndex(Card._index);
-                    this.eliminate();
-                    // this.isClick = true;
+                }).to(0.05, { scale: new Vec3(1, 1, 1) }).call(() => {
+                    this.eliminate(Card._type);
                 }).start();
             }
         }
@@ -358,35 +355,50 @@ export class gaming extends Component {
     }
 
     // 三消逻辑
-    private eliminate() {
-        this.isClick = false;
-        let temp = [];
-        const is = this.columnArr.every(item => {
-            const arr = this.columnArr.filter(i => {
-                return item.type == i.type
-            });
-            if (arr.length == 3) {
-                arr.forEach(i => {
-                    const ind = this.columnArr.indexOf(i);
-                    this.columnArr.splice(ind, 1);
+    private eliminate(_type) {
 
-                    const node = this.container.children[i.index];
-                    tween(node).to(0.15, { scale: new Vec3(0.2, 0.2, 0.2) }).call(() => {
-                        node.active = false;
-                    }).start();
-                })
-                this._remainingCardNum -= 3;
-                return false;
-            }
-            return true;
+        let is = true;
+        const arr = this.columnArr.filter(i => {
+            return _type == i.type
         });
+        if (arr.length == 3) {
+            is = false;
+            arr.forEach(i => {
+                const ind = this.columnArr.indexOf(i);
+                this.columnArr.splice(ind, 1);
 
-        if (is || this.columnArr.length == 0) {
-            this.isClick = true;
-        } else {
-            // this.scheduleOnce(() => {
+                const node = this.container.children[i.index];
+                tween(node).to(0.1, { scale: new Vec3(0.2, 0.2, 0.2) }).call(() => {
+                    node.active = false;
+                }).start();
+            })
+            this._remainingCardNum -= 3;
+        }
+
+        // const is = this.columnArr.every(item => {
+        //     const arr = this.columnArr.filter(i => {
+        //         return item.type == i.type
+        //     });
+        //     if (arr.length == 3) 0222{
+        //         arr.forEach(i => {
+        //             const ind = this.columnArr.indexOf(i);
+        //             this.columnArr.splice(ind, 1);
+
+        //             const node = this.container.children[i.index];
+        //             tween(node).to(0.15, { scale: new Vec3(0.2, 0.2, 0.2) }).call(() => {
+        //                 node.active = false;
+        //             }).start();
+        //         })
+        //         this._remainingCardNum -= 3;
+        //         return false;
+        //     }
+        //     return true;
+        // });
+
+        if (!is) {
             this.resetColumnPos();
-            // }, 0.16);
+        } else {
+            this.isClick = true;
         }
 
         // 游戏结束
@@ -395,7 +407,6 @@ export class gaming extends Component {
             this.isClick = false;
             this.gameOver();
         }
-        // console.log(this._remainingCardNum);
 
         if (this._remainingCardNum <= 0) {
             this.gameOverSuccess();
@@ -404,13 +415,17 @@ export class gaming extends Component {
 
     // 重置位置
     private resetColumnPos() {
-        // this.isClick = false;
-        this.columnArr.forEach((item, i) => {
-            let node = this.container.children[item.index];
-            const x = (i + 1) * 80 - 40;
-            tween(node).to(0.15, { position: new Vec3(x, -835, 0) }).start();
+        this.isClick = false;
+        if (this.columnArr.length > 0) {
+            this.columnArr.forEach((item, i) => {
+                let node = this.container.children[item.index];
+                const x = (i + 1) * 80 - 40;
+                tween(node).to(0.1, { position: new Vec3(x, -835, 0) }).start();
+                this.isClick = true;
+            })
+        } else {
             this.isClick = true;
-        })
+        }
     }
 
     // 重新洗牌

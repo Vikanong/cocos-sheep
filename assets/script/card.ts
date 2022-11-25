@@ -45,7 +45,7 @@ export class card extends Component {
         this._type = type;
         let icon = this.node.getChildByName('icon');
         icon.getComponent(Sprite).spriteFrame = this[`card${type}`];
-        icon.setScale(0.5, 0.5);
+        // icon.setScale(0.5, 0.5);
     }
 
     public setCard(point: number, index: number, type: number) {

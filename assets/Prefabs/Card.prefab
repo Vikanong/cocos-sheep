@@ -103,8 +103,8 @@
     },
     "_lscale": {
       "__type__": "cc.Vec3",
-      "x": 1,
-      "y": 1,
+      "x": 0.9,
+      "y": 0.9,
       "z": 1
     },
     "_layer": 33554432,
@@ -406,63 +406,63 @@
       "__id__": 19
     },
     "card1": {
-      "__uuid__": "dc16c220-52e3-40df-a093-b50b0d1ab8ac@f9941",
+      "__uuid__": "85f3a974-5a79-4e30-acb5-f32d4aad0241@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card2": {
-      "__uuid__": "bb92fd74-4725-48c7-9595-9308ad1fd236@f9941",
+      "__uuid__": "9de036af-2274-48eb-997d-e332077df289@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card3": {
-      "__uuid__": "93ebfbc4-8783-497b-9027-5b8e22ca62b9@f9941",
+      "__uuid__": "bbf00a4d-256e-45c9-9aef-729566bcdfc6@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card4": {
-      "__uuid__": "9dc8e64e-2b0a-4eaa-9963-74a51cebe028@f9941",
+      "__uuid__": "71bed5d7-d52b-459d-9944-ff38d3b20abb@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card5": {
-      "__uuid__": "8c097827-1447-4e26-b407-5a47650fb82e@f9941",
+      "__uuid__": "d38fd7f6-a6f5-4ffa-af43-945d1a20837e@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card6": {
-      "__uuid__": "178caf60-e58d-4e73-a2e3-15a369447f6a@f9941",
+      "__uuid__": "a5a0983b-ebaa-4208-9506-750a16f35f04@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card7": {
-      "__uuid__": "b134aa8f-e0d1-4af1-8fc1-5cb7a9d469cf@f9941",
+      "__uuid__": "54cc1e4d-e4e6-484a-89ef-df2948e8b29c@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card8": {
-      "__uuid__": "5a79d553-1697-4fda-8ab3-f0fc3c005f5c@f9941",
+      "__uuid__": "31f15051-67ba-4f79-8e75-b4222b57347c@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card9": {
-      "__uuid__": "ad0e69f5-6ff6-4ebf-b618-378a448698eb@f9941",
+      "__uuid__": "25846008-5f68-4a5d-8adb-c6f338d714dc@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card10": {
-      "__uuid__": "cf08d0e9-4b9c-44c8-bd90-e73c18e3c246@f9941",
+      "__uuid__": "f3962e05-84aa-4b2c-b33d-c5f22c42a7a7@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card11": {
-      "__uuid__": "c541ae13-4c2c-478c-a136-6a089c1852e7@f9941",
+      "__uuid__": "bf77fdc6-bace-4e3f-b27b-4e2ee9a03425@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card12": {
-      "__uuid__": "9582cf3b-56eb-4352-aca4-e0786a319f47@f9941",
+      "__uuid__": "dace4870-a109-4b2a-b6bf-7d8dbb79b008@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card13": {
-      "__uuid__": "e90c0329-1138-40eb-9957-43f5c9cf7cdf@f9941",
+      "__uuid__": "b6b25723-2612-4d54-be78-d7cbfd8906f6@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card14": {
-      "__uuid__": "a916334b-4526-4582-85c5-484f5cb6082d@f9941",
+      "__uuid__": "800c79e6-2104-43e7-86c7-6e8b103ec308@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "card15": {
-      "__uuid__": "6af35d05-8fa7-4bcd-a8b7-71920bb17a4b@f9941",
+      "__uuid__": "78e65513-51ce-4b5b-9c5d-3883cbfb2eac@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_id": ""
