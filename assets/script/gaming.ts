@@ -65,7 +65,7 @@ export class gaming extends Component {
     private gameStatus = 0   //0：游戏准备，1：游戏进行中，2：游戏结束
 
     // 暂存的卡片
-    private columnArr: object[] = []
+    private _columnArr: object[] = []
 
     // 是否可以点击
     private isClick: boolean = true
@@ -79,6 +79,12 @@ export class gaming extends Component {
     private shuffleTotal: number = 2   // 修改还需要改重置方法里的值
     @property(Label)
     public shuffleTotalLabel: Label = null
+
+    // 可移除槽位次数
+    private temporaryTotal: number = 1
+    private _temporary: number[] = []
+    @property(Label)
+    public temporaryTotalLabel: Label = null
 
 
     // 生成总坐标
@@ -200,7 +206,7 @@ export class gaming extends Component {
     // 点击卡片
     private cardClick(e) {
         if (!this.isClick) return;
-        const l = this.columnArr.length;
+        const l = this._columnArr.length;
         if (l < 7) {
             let node = e.currentTarget;
             let Card = node.getComponent(card)
@@ -212,7 +218,7 @@ export class gaming extends Component {
                 this._cardsObj[Card._point].splice(arr.indexOf(Card._index), 1);
                 this._allCard[Card._index].isClick = false;
 
-                this.columnArr.push({
+                this._columnArr.push({
                     index: Card._index,
                     point: Card._point,
                     type: Card._type
@@ -221,7 +227,7 @@ export class gaming extends Component {
                 this.clickableCheck(Card);
                 node.setSiblingIndex(999);
 
-                const x = this.columnArr.length * 80 - 40;
+                const x = this._columnArr.length * 80 - 40;
                 tween(node).to(0.05, { scale: new Vec3(1.13, 1.13, 1.13) }).to(0.2, { position: new Vec3(x, -835, 0) }).call(() => {
                     node.setSiblingIndex(Card._index);
                 }).to(0.05, { scale: new Vec3(1, 1, 1) }).call(() => {
@@ -258,11 +264,11 @@ export class gaming extends Component {
         this.withdrawTotal--;
         this.withdrawTotalLabel.string = this.withdrawTotal.toString();
 
-        if (this.columnArr.length <= 0) return;
+        if (this._columnArr.length <= 0) return;
         this.isClick = false;
 
-        const obj = this.columnArr.slice(-1)[0];
-        this.columnArr.pop();
+        const obj = this._columnArr.slice(-1)[0];
+        this._columnArr.pop();
         if (this._cardsObj[obj.point]) {
             this._cardsObj[obj.point].push(obj.index);
         } else {
@@ -358,14 +364,14 @@ export class gaming extends Component {
     private eliminate(_type) {
 
         let is = true;
-        const arr = this.columnArr.filter(i => {
+        const arr = this._columnArr.filter(i => {
             return _type == i.type
         });
         if (arr.length == 3) {
             is = false;
             arr.forEach(i => {
-                const ind = this.columnArr.indexOf(i);
-                this.columnArr.splice(ind, 1);
+                const ind = this._columnArr.indexOf(i);
+                this._columnArr.splice(ind, 1);
 
                 const node = this.container.children[i.index];
                 tween(node).to(0.1, { scale: new Vec3(0.2, 0.2, 0.2) }).call(() => {
@@ -375,26 +381,6 @@ export class gaming extends Component {
             this._remainingCardNum -= 3;
         }
 
-        // const is = this.columnArr.every(item => {
-        //     const arr = this.columnArr.filter(i => {
-        //         return item.type == i.type
-        //     });
-        //     if (arr.length == 3) 0222{
-        //         arr.forEach(i => {
-        //             const ind = this.columnArr.indexOf(i);
-        //             this.columnArr.splice(ind, 1);
-
-        //             const node = this.container.children[i.index];
-        //             tween(node).to(0.15, { scale: new Vec3(0.2, 0.2, 0.2) }).call(() => {
-        //                 node.active = false;
-        //             }).start();
-        //         })
-        //         this._remainingCardNum -= 3;
-        //         return false;
-        //     }
-        //     return true;
-        // });
-
         if (!is) {
             this.resetColumnPos();
         } else {
@@ -402,7 +388,7 @@ export class gaming extends Component {
         }
 
         // 游戏结束
-        if (this.columnArr.length >= 7) {
+        if (this._columnArr.length >= 7) {
             this.gameStatus = 2;
             this.isClick = false;
             this.gameOver();
@@ -416,8 +402,8 @@ export class gaming extends Component {
     // 重置位置
     private resetColumnPos() {
         this.isClick = false;
-        if (this.columnArr.length > 0) {
-            this.columnArr.forEach((item, i) => {
+        if (this._columnArr.length > 0) {
+            this._columnArr.forEach((item, i) => {
                 let node = this.container.children[item.index];
                 const x = (i + 1) * 80 - 40;
                 tween(node).to(0.1, { position: new Vec3(x, -835, 0) }).start();
@@ -459,12 +445,30 @@ export class gaming extends Component {
         })
     }
 
+    // 移出槽位
+    private moveSlot() {
+        if (this.temporaryTotal <= 0) return;
+        this.temporaryTotal--;
+        this.temporaryTotalLabel.string = this.temporaryTotal.toString();
+
+        this._temporary = this._columnArr.splice(-3, 3);
+        this._temporary.forEach((i, ind) => {
+            const node = this.container.children[i.index];
+            const x = (ind + 1) * 80 - 40;
+            tween(node).to(0.1, { position: new Vec3(x, -700, 0) }).call(() => {
+                this.resetColumnPos();
+                node.on(Input.EventType.TOUCH_START, this.cardClick, this);
+            }).start();
+        })
+    }
+
     // 重置游戏
     private resetGame() {
         this._allCard = [];
         this._cardsObj = {};
         this.gameStatus = 0;
-        this.columnArr = [];
+        this._columnArr = [];
+        this._temporary = [];
         this.isClick = true;
         this._remainingCardNum = this._cardTotal;
         this.container.removeAllChildren();
@@ -476,6 +480,9 @@ export class gaming extends Component {
 
         this.shuffleTotal = 2;
         this.shuffleTotalLabel.string = this.shuffleTotal.toString();
+
+        this.temporaryTotal = 1;
+        this.temporaryTotalLabel.string = this.temporaryTotal.toString();
 
         this.randomType();
         this.createCard();

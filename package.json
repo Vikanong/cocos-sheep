@@ -5,5 +5,8 @@
   "creator": {
     "version": "3.6.0"
   },
-  "description": "币了个币"
+  "description": "币了个币",
+  "dependencies": {
+    "fingerprintjs2": "^2.1.4"
+  }
 }
